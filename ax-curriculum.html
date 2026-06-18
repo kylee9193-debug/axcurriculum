@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AX 강의 커리큘럼 — 재직자 실무 AI 전환</title>
+<style>
+  @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+  :root {
+    --bg: #141414;
+    --surface: #1e1e1e;
+    --card: #232323;
+    --border: #2e2e2e;
+    --lime: #c8f135;
+    --mint: #4dffc3;
+    --amber: #f5a623;
+    --text: #f0f0f0;
+    --muted: #8a8a8a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    overflow-x: hidden;
+    width: 100%;
+  }
+
+  body {
+    font-family: 'Pretendard', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 32px 16px 64px;
+  }
+
+  .container { max-width: 900px; margin: 0 auto; width: 100%; }
+
+  .header {
+    text-align: center;
+    padding: 40px 0 36px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 40px;
+  }
+  .eyebrow {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--lime);
+    margin-bottom: 14px;
+  }
+  .header h1 {
+    font-size: clamp(24px, 7vw, 44px);
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    margin-bottom: 14px;
+    word-break: keep-all;
+  }
+  .header h1 span { color: var(--lime); }
+  .header p {
+    color: var(--muted);
+    font-size: 13px;
+    max-width: 480px;
+    margin: 0 auto;
+    word-break: keep-all;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 32px;
+    background: var(--surface);
+    padding: 5px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+  .tab {
+    flex: 1;
+    text-align: center;
+    padding: 12px 6px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--muted);
+    transition: all 0.2s;
+    border: none;
+    background: transparent;
+    line-height: 1.4;
+  }
+  .tab span { font-size: 11px; font-weight: 500; display: block; margin-top: 2px; }
+  .tab.active-7 { background: var(--lime); color: #0a0a0a; }
+  .tab.active-14 { background: var(--mint); color: #0a0a0a; }
+  .tab.active-21 { background: var(--amber); color: #0a0a0a; }
+
+  .plan { display: none; }
+  .plan.visible { display: block; }
+
+  .plan-intro {
+    margin-bottom: 24px;
+    padding: 18px 18px;
+    background: var(--surface);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+  .plan-intro-title {
+    font-size: 16px;
+    font-weight: 800;
+    margin-bottom: 6px;
+  }
+  .plan-intro-desc {
+    color: var(--muted);
+    font-size: 12.5px;
+    line-height: 1.65;
+    word-break: keep-all;
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 28px;
+  }
+  .stat {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 6px;
+    text-align: center;
+  }
+  .stat-num {
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 2px;
+  }
+  .stat-label { font-size: 10px; color: var(--muted); font-weight: 500; }
+
+  .chapter { margin-bottom: 24px; }
+  .chapter-header {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .chapter-num {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+  .chapter-title {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    word-break: keep-all;
+  }
+  .chapter-tag {
+    margin-left: auto;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .lesson-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .lesson-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 13px 14px;
+  }
+  .lesson-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .lesson-num {
+    font-size: 12px;
+    font-weight: 800;
+    flex-shrink: 0;
+    min-width: 20px;
+  }
+  .lesson-name {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--text);
+    flex: 1;
+    word-break: keep-all;
+    line-height: 1.4;
+  }
+  .lesson-time {
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--muted);
+    white-space: nowrap;
+    flex-shrink: 0;
+    padding-top: 1px;
+  }
+  .lesson-desc {
+    font-size: 12px;
+    color: #aaa;
+    line-height: 1.6;
+    padding-left: 28px;
+    word-break: keep-all;
+  }
+
+  .outcome {
+    margin-top: 24px;
+    padding: 18px 18px;
+    border-radius: 10px;
+    background: #1a1f10;
+  }
+  .outcome h4 {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .outcome ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .outcome li {
+    font-size: 12.5px;
+    color: #ddd;
+    display: flex;
+    gap: 8px;
+    word-break: keep-all;
+    line-height: 1.5;
+  }
+  .outcome li::before { content: "→"; font-weight: 700; flex-shrink: 0; }
+
+  footer {
+    text-align: center;
+    margin-top: 56px;
+    padding-top: 28px;
+    border-top: 1px solid var(--border);
+    color: #555;
+    font-size: 11px;
+  }
+
+  /* ============ 페이지별 포인트 컬러 ============ */
+  #plan-7 .chapter-title,
+  #plan-7 .stat-num,
+  #plan-7 .lesson-num,
+  #plan-7 .chapter-num { color: var(--lime); }
+  #plan-7 .lesson-card { border-left: 2px solid var(--lime); }
+  #plan-7 .chapter-tag { background: #1e2a1e; color: #c8f135; }
+  #plan-7 .outcome { background: #161d0c; }
+  #plan-7 .outcome h4 { color: var(--lime); }
+  #plan-7 .plan-intro { border-color: #3a4a1f; }
+  #plan-7 .stat { border-color: #3a4a1f; }
+
+  #plan-14 .chapter-title,
+  #plan-14 .stat-num,
+  #plan-14 .lesson-num,
+  #plan-14 .chapter-num { color: var(--mint); }
+  #plan-14 .lesson-card { border-left: 2px solid var(--mint); }
+  #plan-14 .chapter-tag { background: #102a26; color: #4dffc3; }
+  #plan-14 .outcome { background: #0c1d18; }
+  #plan-14 .outcome h4 { color: var(--mint); }
+  #plan-14 .plan-intro { border-color: #1f4a40; }
+  #plan-14 .stat { border-color: #1f4a40; }
+
+  #plan-21 .chapter-title,
+  #plan-21 .stat-num,
+  #plan-21 .lesson-num,
+  #plan-21 .chapter-num { color: var(--amber); }
+  #plan-21 .lesson-card { border-left: 2px solid var(--amber); }
+  #plan-21 .chapter-tag { background: #2a2010; color: #f5a623; }
+  #plan-21 .outcome { background: #1d160c; }
+  #plan-21 .outcome h4 { color: var(--amber); }
+  #plan-21 .plan-intro { border-color: #4a3a1f; }
+  #plan-21 .stat { border-color: #4a3a1f; }
+
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header class="header">
+    <p class="eyebrow">재직자 대상 · AI 전환 교육 커리큘럼</p>
+    <h1>AI로 일하는 방식을<br><span>지금 바꿔보세요</span></h1>
+    <p>현업에서 바로 쓸 수 있는 AX(AI Transformation) 강의.<br>이론부터 자동화 실습까지, 수준에 맞게 선택하세요.</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active-7" onclick="showPlan('7')">⚡ 7시간<span>집중 입문</span></button>
+    <button class="tab" onclick="showPlan('14')">🚀 14시간<span>실무 완성</span></button>
+    <button class="tab" onclick="showPlan('21')">🏆 21시간<span>자동화 마스터</span></button>
+  </div>
+
+  <!-- ============ 7시간 ============ -->
+  <div class="plan visible" id="plan-7">
+
+    <div class="plan-intro">
+      <div class="plan-intro-title">⚡ 원데이 집중 입문 과정</div>
+      <div class="plan-intro-desc">AI 도구를 처음 접하는 재직자를 위한 빠른 온보딩. 반나절 만에 ChatGPT·Claude를 실무에 연결합니다.</div>
+    </div>
+
+    <div class="chapter">
+      <div class="chapter-header">
+        <span class="chapter-num">CH 01</span>
+        <span class="chapter-title">AI 감 잡기 — 지금 왜 배워야 하나</span>
+        <span class="chapter-tag">이론</span>
+      </div>
+      <div class="lesson-list">
+        <div class="lesson-card">
+          <div class="lesson-top">
+            <span class="lesson-num">01</span>
+            <span class="lesson-name">AI 시대, 재직자의 생존 전략</span>
+            <span class="lesson-time">40분</span>
+          </div>
+          <div class="lesson-desc">생성형 AI 등장 배경 · 업무 자동화 트렌드 · 수강생 니즈 진단</div>
+        </div>
+        <div class="lesson-card">
+          <div class="lesson-top">
+            <span class="lesson-num">02</span>
+            <span class="lesson-name">AI 툴 지도 한눈에 보기</span>
+            <span class="lesson-time">50분</span>
+          </div>
+          <div class="lesson-desc">ChatGPT · Claude · Gemini · Copilot 비교 · 무료/유료 선택 기준</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chapter">
+      <div class="chapter-header">
+        <span class="chapter-num">CH 02</span>
+        <span class="chapter-title">프롬프트 실전 — AI에게 잘 시키는 법</span>
+        <span class="chapter-tag">실습</span>
+      </div>
+      <div class="lesson-list">
+        <div class="lesson-card">
+          <div class="lesson-top">
+            <span class="lesson-num">03</span>
+            <span class="lesson-name">프롬프트 3패턴 완전 정복</span>
+            <span class="lesson-time">60분</span>
+          </div>
+          <div class="lesson-desc">역할 부여 · 맥락 제공 · 출력 형식 지정 · 반복 개선법</div>
+        </div>
+        <div class="lesson-card">
+          <div class="lesson-top">
+            <span class="lesson-num">04</span>
+            <span class="lesson-name">[실습] 내 업무에 맞는 프롬프트 만들기</span>
+            <span class="lesson-time">60분</span>
+          </div>
+          <div class="lesson-desc">이메일 초안 · 보고서 요약 · 회의록 작성 직접 실습</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chapter">
+      <div class="chapter-header">
+        <span class="chapter-num">CH 03</span>
+        <span class="chapter-title">업무 루틴 바꾸기 — 퇴근 1시간 앞당기기</span>
+        <span class="chapter-tag">실습랩</span>
+      </div>
+      <div class="lesson-list">
+        <div class="lesson-card">
+          <div class="lesson-top">
+            <span class="lesson-num">05</span>
+            <span class="lesson-name">엑셀·PPT를 AI가 대신 만든다</span>
+            <span class="lesson-time">70분</span>
+          </div>
+          <div class="lesson-desc">수식 자동 생성 · PPT 초안 30분 완성 · AI 검토 루틴</div>
+        </div>
+        <div class="lesson-card">
+          <div class="lesson-top">
+            <span class="lesson-num">06</span>
+            <span class="lesson-name">[실습] 나만의 AI 업무 루틴 설계</span>
+            <span class="lesson-time">60분</span>
+          </div>
+          <div class="lesson-desc">반복 업무 목록화 · 나만의 AI 워크플로 1개 완성</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="outcome">
+      <h4>이 과정을 마치면</h4>
+      <ul>
+        <li>ChatGPT·Claude를 실무 문서 작업에 바로 연결할 수 있습니다</li>
+        <li>상황별 프롬프트 3패턴을 체화해 원하는 결과물을 뽑아낼 수 있습니다</li>
+        <li>반복되는 보고서·이메일·회의록 작업 시간을 절반으로 줄일 수 있습니다</li>
+      </ul>
+    </div>
+
+  </div><!-- /plan-7 -->
+
+
+  <!-- ============ 14시간 ============ -->
+  <div class="plan" id="plan-14">
+
+    <div class="plan-intro">
+      <div class="plan-intro-title">🚀 2일 실무 완성 과정</div>
+      <div class="plan-intro-desc">AI 기초 + 자동화 입문까지. 실제 업무 데이터를 가지고 와서 결과물을 만들어가는 실전 부트캠프.</div>
+    </div>
+
+    <div class="chapter">
+      <div class="chapter-header">
+        <span class="chapter-num">DAY 1 · CH 01</span>
+        <span class="chapter-title">AI 개념 & 툴 셋업</span>
+        <span class="chapter-tag">이론</span>
+      </div>
+      <div class="lesson-list">
+        <div class="lesson-card">
+          <div class="lesson-top">
+            <span class="lesson-num">01</span>
+            <span class="lesson-name">AI 시대 재직자 생존 전략</span>
+            <span class="lesson-time">40분</span>
+          </div>
+          <div class="lesson-desc">생성형 AI 트렌드 · 직군별 활용 사례 · AI 도입 실패 이유</div>
+        </div>
+        <div class="lesson-card">
+          <div class="lesson-top">
+            <span class="lesson-num">02</span>
+            <span class="lesson-name">AI 툴 비교 & 나에게 맞는 툴 고르기</span>
+            <span class="lesson-time">50분</span>
+          </div>
+          <div class="lesson-desc">ChatGPT·Claude·Gemini·Copilot 실제 비교 시연</div>
+        </div>
+        <div class="lesson-card">
+          <div class="lesson-top">
+            <span class="lesson-num">03</span>
+            <span class="lesson-name">환경 세팅 & API 연결 기초</span>
+            <span class="lesson-time">40분</span>
+          </div>
+          <div class="lesson-desc">계정 설정 · 유료/무료 플랜 선택 · 보안 주의사항</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chapter">
+      <div class="chapter-header">
+        <span class="chapter-num">DAY 1 · CH 02</span>
+        <span class="chapter-title">프롬프트 마스터</span>
+        <span class="chapter-tag">실습</span>
+      </div>
+      <div class="lesson-list">
+        <div class="lesson-card">
+          <div class="lesson-top">
+            <span class="lesson-num">04</span>
+            <span class="lesson-name">프롬프트 설계 원리 3패턴</span>
+            <span class="lesson-time">60분</span>
+          </div>
+          <div class="lesson-desc">역할·맥락·형식 지정 · 체인 프롬프팅 · 페르소나 설정</div>
+        </div>
+        <div class="lesson-card">
+          <div class="lesson-top">
+            <span class="lesson-num">05</span>
+            <span class="lesson-name">[실습] 직무별 프롬프트 워크숍</span>
+            <span class="lesson-time">70분</span>
+          </div>
+          <div class="lesson-desc">영업·기획·인사·마케팅 별 시나리오 실습</div>
+        </div>
+        <div class="lesson-card">
+          <div class="lesson-top">
+            <span class="lesson-num">06</span>
+            <span class="lesson-name">나만의 AI 직원 만들기</span>
+            <span class="lesson-time">60분</span>
+          </div>
+          <div class="lesson-desc">Custom Instruction · 시스템 프롬프트 설계 · 저장 & 재사용</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chapter">
+      <div class="chapter-header">
+        <span class="chapter-num">DAY 2 · CH 03</span>
+        <span class="chapter-title">실무 루틴 자동화</span>
+        <span class="chapter-tag">실습랩</span>
+      </div>
+      <div class="lesson-list">
+        <div class="lesson-card">
+          <div class="lesson-top">
+            <span class="lesson-num">07</span>
+            <span class="lesson-name">엑셀 수식·데이터 분석 AI로 끝내기</span>
+            <span class="lesson-time">70분</span>
+          </div>
+          <div class="lesson-desc">VLOOKUP·피벗 자동 생성 · 오류 수정 · 데이터 해석 요청법</div>
+        </div>
+        <div class="lesson-card">
+          <div class="lesson-top">
+            <span class="lesson-num">08</span>
+            <span class="lesson-name">보고서·PPT AI 초안 30분 완성</span>
+            <span class="lesson-time">60분</span>
+          </div>
+          <div class="lesson-desc">목차 구성 · 슬라이드 자동화 · 디자인 프롬프트</div>
+        </div>
+        <div class="lesson-card">
+          <div class="lesson-top">
+            <span class="lesson-num">09</span>
+            <span class="lesson-name">반복 업무 AI에게 위임하기</span>
+            <span class="lesson-time">60분</span>
+          </div>
+          <div class="lesson-desc">이메일 자동 분류 · 회의록 생성 · 주간보고 자동화</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chapter">
+      <div class="chapter-header">
+        <span class="chapter-num">DAY 2 · CH 04</span>
+        <span class="chapter-title">노코드 자동화 입문</span>
+        <span class="chapter-tag">실습랩</span>
+      </div>
+      <div class="lesson-list">
+        <div class="lesson-card">
+          <div class="lesson-top">
+            <span class="lesson-num">10</span>
+            <span class="lesson-name">Make·Zapier로 업무 연결하기</span>
+            <span class="lesson-time">70분</span>
+          </div>
+          <div class="lesson-desc">트리거-액션 개념 · 이메일→슬랙 자동 알림 실습</div>
+        </div>
+        <div class="lesson-card">
+          <div class="lesson-top">
+            <span class="lesson-num">11</span>
+            <span class="lesson-name">[실습] 나만의 자동화 플로우 1개 완성</span>
+            <span class="lesson-time">60분</span>
+          </div>
+          <div class="lesson-desc">내 업무 기반 자동화 시나리오 설계 + 실행</div>
+        </div>
+        <div class="lesson-card">
+          <div class="lesson-top">
+            <span class="lesson-num">12</span>
+            <span class="lesson-name">AI 업무 루틴 설계 & 발표</span>
+            <span class="lesson-time">50분</span>
+          </div>
+          <div class="lesson-desc">개인별 AI 루틴 발표 · 그룹 피드백 · 실행 계획 수립</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="outcome">
+      <h4>이 과정을 마치면</h4>
+      <ul>
+        <li>프롬프트 설계 원리를 이해하고 직무에 맞는 AI 어시스턴트를 직접 만들 수 있습니다</li>
+        <li>엑셀·PPT·보고서 작업 시간을 70% 이상 단축할 수 있습니다</li>
+        <li>Make/Zapier 기반 노코드 자동화 워크플로를 1개 이상 완성해 바로 쓸 수 있습니다</li>
+        <li>팀·조직의 AI 도입을 리드할 수 있는 AX 실행력을 갖춥니다</li>
+      </ul>
+    </div>
+
+  </div><!-- /plan-14 -->
+
+
+  <!-- ============ 21시간 ============ -->
+  <div class="plan" id="plan-21">
+
+    <div class="plan-intro">
+      <div class="plan-intro-title">🏆 3일 자동화 마스터 과정</div>
+      <div class="plan-intro-desc">AI 기초부터 바이브코딩·API 연결까지. 코딩 몰라도 업무용 AI 앱을 직접 만들어 배포합니다.</div>
+    </div>
+
+    <div class="chapter">
+      <div class="chapter-header">
+        <span class="chapter-num">DAY 1 · CH 01</span>
+        <span class="chapter-title">AI 기초 & 프롬프트 완성</span>
+        <span class="chapter-tag">이론+실습</span>
+      </div>
+      <div class="lesson-list">
+        <div class="lesson-card">
+          <div class="lesson-top">
+            <span class="lesson-num">01</span>
+            <span class="lesson-name">AI 전환 시대, 재직자의 포지셔닝</span>
+            <span class="lesson-time">50분</span>
+          </div>
+          <div class="lesson-desc">생성형 AI 전망 · 직군별 위험/기회 · AX 전략 사례</div>
+        </div>
+        <div class="lesson-card">
+          <div class="lesson-top">
+            <span class="lesson-num">02</span>
+            <span class="lesson-name">AI 툴 생태계 완전 정복</span>
+            <span class="lesson-time">60분</span>
+          </div>
+          <div class="lesson-desc">ChatGPT·Claude·Gemini·Copilot·Perplexity 실전 비교</div>
+        </div>
+        <div class="lesson-card">
+          <div class="lesson-top">
+            <span class="lesson-num">03</span>
+            <span class="lesson-name">환경 세팅 & API 연결</span>
+            <span class="lesson-time">50분</span>
+          </div>
+          <div class="lesson-desc">계정·플랜·보안 설정 · Claude API·OpenAI API 키 발급</div>
+        </div>
+        <div class="lesson-card">
+          <div class="lesson-top">
+            <span class="lesson-num">04</span>
+            <span class="lesson-name">프롬프트 설계 원리 & 3패턴</span>
+            <span class="lesson-time">60분</span>
+          </div>
+          <div class="lesson-desc">역할·맥락·형식 · 체인 프롬프팅 · 실패 패턴 분석</div>
+        </div>
+        <div class="lesson-card">
+          <div class="lesson-top">
+            <span class="lesson-num">05</span>
+            <span class="lesson-name">[실습] 직무별 프롬프트 워크숍</span>
+            <span class="lesson-time">70분</span>
+          </div>
+          <div class="lesson-desc">영업·기획·인사·마케팅 시나리오 실습 + 발표</div>
+        </div>
+        <div class="lesson-card">
+          <div class="lesson-top">
+            <span class="lesson-num">06</span>
+            <span class="lesson-name">나만의 AI 직원 세팅하기</span>
+            <span class="lesson-time">60분</span>
+          </div>
+          <div class="lesson-desc">Custom GPT · Claude Project · 시스템 프롬프트 설계</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chapter">
+      <div class="chapter-header">
+        <span class="chapter-num">DAY 2 · CH 02</span>
+        <span class="chapter-title">실무 루틴 자동화 집중</span>
+        <span class="chapter-tag">실습랩</span>
+      </div>
+      <div class="lesson-list">
+        <div class="lesson-card">
+          <div class="lesson-top">
+            <span class="lesson-num">07</span>
+            <span class="lesson-name">엑셀·데이터 분석 AI 자동화</span>
+            <span class="lesson-time">80분</span>
+          </div>
+          <div class="lesson-desc">수식 생성·오류 수정·피벗·차트·데이터 해석 요청법</div>
+        </div>
+        <div class="lesson-card">
+          <div class="lesson-top">
+            <span class="lesson-num">08</span>
+            <span class="lesson-name">보고서·PPT 30분 초안 완성법</span>
+            <span class="lesson-time">70분</span>
+          </div>
+          <div class="lesson-desc">목차 자동 생성 · 슬라이드 내용 채우기 · Gamma·Canva AI 활용</div>
+        </div>
+        <div class="lesson-card">
+          <div class="lesson-top">
+            <span class="lesson-num">09</span>
+            <span class="lesson-name">반복 업무 통째로 위임하기</span>
+            <span class="lesson-time">60분</span>
+          </div>
+          <div class="lesson-desc">이메일·회의록·주간보고·채용공고 자동화 시나리오</div>
+        </div>
+        <div class="lesson-card">
+          <div class="lesson-top">
+            <span class="lesson-num">10</span>
+            <span class="lesson-name">노코드 자동화 플랫폼 입문</span>
+            <span class="lesson-time">70분</span>
+          </div>
+          <div class="lesson-desc">Make·Zapier 트리거-액션 · 슬랙/이메일/구글시트 연결</div>
+        </div>
+        <div class="lesson-card">
+          <div class="lesson-top">
+            <span class="lesson-num">11</span>
+            <span class="lesson-name">[실습] 자동화 플로우 설계 & 실행</span>
+            <span class="lesson-time">70분</span>
+          </div>
+          <div class="lesson-desc">내 업무 기반 자동화 1개 완성 · 팀별 시나리오 공유</div>
+        </div>
+        <div class="lesson-card">
+          <div class="lesson-top">
+            <span class="lesson-num">12</span>
+            <span class="lesson-name">AI 업무 루틴 대시보드 만들기</span>
+            <span class="lesson-time">60분</span>
+          </div>
+          <div class="lesson-desc">Notion AI · 업무 KPI 트래커 · 루틴 캘린더 구성</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chapter">
+      <div class="chapter-header">
+        <span class="chapter-num">DAY 3 · CH 03</span>
+        <span class="chapter-title">바이브코딩 & AI 앱 제작</span>
+        <span class="chapter-tag">실습랩</span>
+      </div>
+      <div class="lesson-list">
+        <div class="lesson-card">
+          <div class="lesson-top">
+            <span class="lesson-num">13</span>
+            <span class="lesson-name">코딩 몰라도 됩니다: AI가 코드 씁니다</span>
+            <span class="lesson-time">60분</span>
+          </div>
+          <div class="lesson-desc">바이브코딩 개념 · Cursor·Claude Code 소개 · 환경 세팅</div>
+        </div>
+        <div class="lesson-card">
+          <div class="lesson-top">
+            <span class="lesson-num">14</span>
+            <span class="lesson-name">바이브코딩 입문 기초지식</span>
+            <span class="lesson-time">50분</span>
+          </div>
+          <div class="lesson-desc">Git 기초 · Node.js 설치 · 터미널 두려움 없애기</div>
+        </div>
+        <div class="lesson-card">
+          <div class="lesson-top">
+            <span class="lesson-num">15</span>
+            <span class="lesson-name">[실습 1] 유튜브 트렌드 자동 수집기</span>
+            <span class="lesson-time">80분</span>
+          </div>
+          <div class="lesson-desc">AI로 크롤러 코드 생성 · 결과 구글시트 저장 자동화</div>
+        </div>
+        <div class="lesson-card">
+          <div class="lesson-top">
+            <span class="lesson-num">16</span>
+            <span class="lesson-name">[실습 2] 회의록 자동 생성기</span>
+            <span class="lesson-time">80분</span>
+          </div>
+          <div class="lesson-desc">음성→텍스트 변환 · AI 요약 · 이메일 자동 발송 연결</div>
+        </div>
+        <div class="lesson-card">
+          <div class="lesson-top">
+            <span class="lesson-num">17</span>
+            <span class="lesson-name">[실습 3] 나만의 매출 대시보드</span>
+            <span class="lesson-time">90분</span>
+          </div>
+          <div class="lesson-desc">데이터 시각화 앱 제작 · AI 인사이트 자동 생성</div>
+        </div>
+        <div class="lesson-card">
+          <div class="lesson-top">
+            <span class="lesson-num">18</span>
+            <span class="lesson-name">AI 업무 루틴 발표 & 다음 스텝</span>
+            <span class="lesson-time">60분</span>
+          </div>
+          <div class="lesson-desc">3일 성과 발표 · 개인 AI 로드맵 수립 · Q&A</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="outcome">
+      <h4>이 과정을 마치면</h4>
+      <ul>
+        <li>ChatGPT·Claude API를 실무 시스템에 직접 연결하는 역량을 갖춥니다</li>
+        <li>코딩 없이 AI 기반 업무 자동화 앱 3개를 스스로 완성합니다</li>
+        <li>팀·부서 전체의 AI 전환을 기획하고 실행할 수 있는 AX 리더가 됩니다</li>
+        <li>회의록·대시보드·데이터 수집기 등 즉시 배포 가능한 결과물을 보유합니다</li>
+      </ul>
+    </div>
+
+  </div><!-- /plan-21 -->
+
+  <footer>
+    AX Curriculum · 재직자 AI 전환 교육 · 기초부터 자동화 실습까지
+  </footer>
+
+</div>
+
+<script>
+  function showPlan(id) {
+    document.querySelectorAll('.plan').forEach(p => p.classList.remove('visible'));
+    document.getElementById('plan-' + id).classList.add('visible');
+
+    document.querySelectorAll('.tab').forEach(t => {
+      t.className = 'tab';
+    });
+    const tabs = document.querySelectorAll('.tab');
+    if (id === '7') tabs[0].classList.add('active-7');
+    if (id === '14') tabs[1].classList.add('active-14');
+    if (id === '21') tabs[2].classList.add('active-21');
+  }
+</script>
+</body>
+</html>
